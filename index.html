@@ -1,167 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#004aad">
-  <meta name="description" content="SANSTEEL SACCO Financial Statement Generator">
-  <title>SANSTEEL SACCO</title>
-  
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
-  
-  <!-- iOS Support -->
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SANSTEEL SACCO">
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body, html {
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      position: fixed;
-    }
-    
-    #app-frame {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-    }
-    
-    .loader {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      font-family: Arial, sans-serif;
-    }
-    
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #004aad;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANSTEEL SACCO - Financial Reports</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .result h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .result-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .error {
+            background: #fee;
+            border-left-color: #e74c3c;
+            color: #c0392b;
+        }
+
+        .success {
+            background: #efe;
+            border-left-color: #27ae60;
+            color: #1e8449;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="loader" id="loader">
-    <div class="spinner"></div>
-    <p>Loading SANSTEEL SACCO...</p>
-  </div>
-  
-  <iframe 
-  id="app-frame"
-  src="https://script.google.com/macros/s/AKfycbyOH2fOsR-tIUUd4jVfHLthX4fB0Gie-ft98PLEZznK2HGqZxM89JIk4rcSvK6aSw/exec"
-  onload="document.getElementById('loader').style.display='none'">
-</iframe>
+    <div class="container">
+        <div class="header">
+            <h1>SANSTEEL SACCO</h1>
+            <p>Your Trusted Financial Partner</p>
+        </div>
 
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">
+                📊 Overview Summary
+            </button>
+            <button class="tab" onclick="switchTab('quarterly')">
+                📈 Quarterly Financial Statement
+            </button>
+        </div>
 
-  <script>
-    // Register Service Worker for PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('Service Worker registered'))
-          .catch(err => console.log('Service Worker registration failed:', err));
-      });
-    }
+        <div class="content">
+            <!-- Overview Summary Tab -->
+            <div id="overview" class="tab-content active">
+                <h2 style="margin-bottom: 20px; color: #333;">Generate Overview Summary</h2>
+                <form id="overviewForm">
+                    <div class="form-group">
+                        <label for="overviewFile">Upload Financial Document (PDF/Excel)</label>
+                        <input type="file" id="overviewFile" accept=".pdf,.xlsx,.xls" required>
+                    </div>
+                    <button type="submit">Generate Overview Summary</button>
+                </form>
 
-    // Prompt for installation
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      // You can show a custom install button here if desired
-    });
-  </script>
+                <div id="overviewLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Processing your document...</p>
+                </div>
+
+                <div id="overviewResult" class="result"></div>
+            </div>
+
+            <!-- Quarterly Financial Statement Tab -->
+            <div id="quarterly" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #333;">Generate Quarterly Financial Statement</h2>
+                <form id="quarterlyForm">
+                    <div class="form-group">
+                        <label for="quarterlyFile">Upload Financial Document (PDF/Excel)</label>
+                        <input type="file" id="quarterlyFile" accept=".pdf,.xlsx,.xls" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quarterSelect">Select Quarter</label>
+                        <select id="quarterSelect" required>
+                            <option value="">-- Select Quarter --</option>
+                            <option value="Q1">Q1 (January - March)</option>
+                            <option value="Q2">Q2 (April - June)</option>
+                            <option value="Q3">Q3 (July - September)</option>
+                            <option value="Q4">Q4 (October - December)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="yearInput">Year</label>
+                        <input type="text" id="yearInput" placeholder="e.g., 2024" required>
+                    </div>
+                    <button type="submit">Generate Quarterly Statement</button>
+                </form>
+
+                <div id="quarterlyLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Processing your quarterly statement...</p>
+                </div>
+
+                <div id="quarterlyResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Endpoints
+        const OVERVIEW_API = 'https://script.google.com/macros/s/AKfycbwOCufPjkayPfyEvFkZED6VWCyst1r0jiL7zBR-XUd1BoscwMT1I2WJnBknKL3D4sYY/exec';
+        const QUARTERLY_API = 'https://script.google.com/macros/s/AKfycbyOH2fOsR-tIUUd4jVfHLthX4fB0Gie-ft98PLEZznK2HGqZxM89JIk4rcSvK6aSw/exec';
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate selected tab
+            event.target.classList.add('active');
+
+            // Clear results when switching tabs
+            document.getElementById('overviewResult').classList.remove('active');
+            document.getElementById('quarterlyResult').classList.remove('active');
+        }
+
+        // File to Base64 conversion
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Overview Summary Form Handler
+        document.getElementById('overviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('overviewFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showResult('overviewResult', 'Please select a file', 'error');
+                return;
+            }
+
+            try {
+                // Show loading
+                document.getElementById('overviewLoading').classList.add('active');
+                document.getElementById('overviewResult').classList.remove('active');
+
+                // Convert file to base64
+                const base64Data = await fileToBase64(file);
+                
+                // Send to API
+                const response = await fetch(OVERVIEW_API, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        file: base64Data,
+                        filename: file.name,
+                        mimeType: file.type
+                    })
+                });
+
+                const result = await response.json();
+                
+                // Hide loading
+                document.getElementById('overviewLoading').classList.remove('active');
+
+                // Show result
+                if (result.success) {
+                    showResult('overviewResult', formatOverviewResult(result.data), 'success');
+                } else {
+                    showResult('overviewResult', result.message || 'An error occurred', 'error');
+                }
+            } catch (error) {
+                document.getElementById('overviewLoading').classList.remove('active');
+                showResult('overviewResult', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        // Quarterly Statement Form Handler
+        document.getElementById('quarterlyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('quarterlyFile');
+            const quarter = document.getElementById('quarterSelect').value;
+            const year = document.getElementById('yearInput').value;
+            const file = fileInput.files[0];
+            
+            if (!file || !quarter || !year) {
+                showResult('quarterlyResult', 'Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                // Show loading
+                document.getElementById('quarterlyLoading').classList.add('active');
+                document.getElementById('quarterlyResult').classList.remove('active');
+
+                // Convert file to base64
+                const base64Data = await fileToBase64(file);
+                
+                // Send to API
+                const response = await fetch(QUARTERLY_API, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        file: base64Data,
+                        filename: file.name,
+                        mimeType: file.type,
+                        quarter: quarter,
+                        year: year
+                    })
+                });
+
+                const result = await response.json();
+                
+                // Hide loading
+                document.getElementById('quarterlyLoading').classList.remove('active');
+
+                // Show result
+                if (result.success) {
+                    showResult('quarterlyResult', formatQuarterlyResult(result.data), 'success');
+                } else {
+                    showResult('quarterlyResult', result.message || 'An error occurred', 'error');
+                }
+            } catch (error) {
+                document.getElementById('quarterlyLoading').classList.remove('active');
+                showResult('quarterlyResult', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        // Display results
+        function showResult(elementId, content, type) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.className = `result active ${type}`;
+            resultDiv.innerHTML = `
+                <h3>${type === 'success' ? '✅ Success' : '❌ Error'}</h3>
+                <div class="result-content">${content}</div>
+            `;
+        }
+
+        // Format overview result
+        function formatOverviewResult(data) {
+            if (typeof data === 'string') return data;
+            return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        // Format quarterly result
+        function formatQuarterlyResult(data) {
+            if (typeof data === 'string') return data;
+            return `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+    </script>
 </body>
 </html>
-
-<!-- manifest.json file (save as separate file) -->
-<!-- 
-{
-  "name": "SANSTEEL SACCO Limited",
-  "short_name": "SANSTEEL",
-  "description": "SANSTEEL SACCO Financial Statement Generator",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#004aad",
-  "orientation": "portrait-primary",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
--->
-
-<!-- service-worker.js file (save as separate file) -->
-<!--
-const CACHE_NAME = 'sansteel-sacco-v1';
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([
-        '/',
-        '/index.html'
-      ]);
-    })
-  );
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
-
--->
