@@ -1,72 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sansteel SACCO Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#004aad">
+  <meta name="description" content="SANSTEEL SACCO Financial Statement Generator">
+  <title>SANSTEEL SACCO</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- iOS Support -->
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SANSTEEL SACCO">
+  
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-    header { background: #003366; color: white; padding: 20px; text-align: center; }
-    nav { display: flex; justify-content: center; gap: 20px; padding: 15px; background: #e0e0e0; }
-    nav button { padding: 10px 20px; border: none; background: #003366; color: white; cursor: pointer; border-radius: 5px; }
-    nav button:hover { background: #0055aa; }
-    section { padding: 20px; display: none; }
-    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body, html {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      position: fixed;
+    }
+    
+    #app-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+    
+    .loader {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+    
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #004aad;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Sansteel SACCO Dashboard</h1>
-    <p>Overview Summary & Quarterly Financial Statement</p>
-  </header>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p>Loading SANSTEEL SACCO...</p>
+  </div>
+  
+  <iframe 
+  id="app-frame"
+  src="https://script.google.com/macros/s/AKfycbz_cp46narszm_QjFgZPU2NxaoVVPkSetvkNspLipJbmS0x6BtY5UaInKDV8gFEo2Gw/exec"
+  onload="document.getElementById('loader').style.display='none'">
+</iframe>
 
-  <nav>
-    <button onclick="showTab('overview')">Overview Summary</button>
-    <button onclick="showTab('quarterly')">Quarterly Financial Statement</button>
-  </nav>
-
-  <!-- Overview Section -->
-  <section id="overview" style="display:block;">
-    <h2>Overview Summary</h2>
-    <div class="card">
-      <p>Loading overview summary...</p>
-    </div>
-  </section>
-
-  <!-- Quarterly Section -->
-  <section id="quarterly">
-    <h2>Quarterly Financial Statement</h2>
-    <div class="card">
-      <p>Loading quarterly data...</p>
-    </div>
-  </section>
 
   <script>
-    function showTab(tab) {
-      document.getElementById('overview').style.display = tab === 'overview' ? 'block' : 'none';
-      document.getElementById('quarterly').style.display = tab === 'quarterly' ? 'block' : 'none';
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed:', err));
+      });
     }
 
-    // Fetch Overview Summary
-    fetch("https://script.google.com/macros/s/AKfycbwOCufPjkayPfyEvFkZED6VWCyst1r0jiL7zBR-XUd1BoscwMT1I2WJnBknKL3D4sYY/exec")
-      .then(res => res.json())
-      .then(data => {
-        document.querySelector('#overview .card').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-      })
-      .catch(err => {
-        document.querySelector('#overview .card').innerHTML = "Error loading overview data.";
-      });
-
-    // Fetch Quarterly Data
-    fetch("https://script.google.com/macros/s/AKfycbyOH2fOsR-tIUUd4jVfHLthX4fB0Gie-ft98PLEZznK2HGqZxM89JIk4rcSvK6aSw/exec")
-      .then(res => res.json())
-      .then(data => {
-        document.querySelector('#quarterly .card').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-      })
-      .catch(err => {
-        document.querySelector('#quarterly .card').innerHTML = "Error loading quarterly data.";
-      });
+    // Prompt for installation
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // You can show a custom install button here if desired
+    });
   </script>
 </body>
 </html>
 
+<!-- manifest.json file (save as separate file) -->
+<!-- 
+{
+  "name": "SANSTEEL SACCO Limited",
+  "short_name": "SANSTEEL",
+  "description": "SANSTEEL SACCO Financial Statement Generator",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#004aad",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+-->
+
+<!-- service-worker.js file (save as separate file) -->
+<!--
+const CACHE_NAME = 'sansteel-sacco-v1';
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll([
+        '/',
+        '/index.html'
+      ]);
+    })
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+-->
